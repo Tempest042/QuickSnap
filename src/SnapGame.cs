@@ -10,10 +10,8 @@ namespace CardGames
         {
             Bitmap cards;
             cards = SwinGame.LoadBitmapNamed ("Cards", "Cards.png");
-            SwinGame.BitmapSetCellDetails (cards, 167, 250, 13, 5, 53);      // set the cells in the bitmap to match the cards
+            SwinGame.BitmapSetCellDetails (cards, 82, 110, 13, 5, 53);      // set the cells in the bitmap to match the cards
         }
-
-
 
 		/// <summary>
 		/// Respond to the user input -- with requests affecting myGame
@@ -29,21 +27,21 @@ namespace CardGames
 				myGame.Start ();
 			}
 
-			if (myGame.IsStarted)
+			if (myGame.IsStarted) 
 			{
-				if ( SwinGame.KeyTyped (KeyCode.vk_LSHIFT) &&
-					 SwinGame.KeyTyped (KeyCode.vk_RSHIFT))
-				{
-						//TODO: add sound effects
-				}
-				else if (SwinGame.KeyTyped (KeyCode.vk_LSHIFT))
-				{
-					myGame.PlayerHit (0);
-				}
-				else if (SwinGame.KeyTyped (KeyCode.vk_RSHIFT))
-				{
-					myGame.PlayerHit (1);
-				}
+				if (SwinGame.KeyTyped (KeyCode.vk_LSHIFT) &&
+					SwinGame.KeyTyped (KeyCode.vk_RSHIFT))
+					{
+						//TODO: ADD SOUND EFFECTS
+					}
+					else if (SwinGame.KeyTyped (KeyCode.vk_LSHIFT))
+					{
+						myGame.PlayerHit (0);
+					}
+					else if (SwinGame.KeyTyped (KeyCode.vk_RSHIFT))
+					{
+						myGame.PlayerHit (1);
+					}
 			}
 		}
 
@@ -53,14 +51,16 @@ namespace CardGames
 		/// <param name="myGame">The details of the game -- mostly top card and scores.</param>
 		private static void DrawGame(Snap myGame)
 		{
-			SwinGame.DrawBitmap("cardsBoard.png", 0, 0);
+			SwinGame.DrawBitmap ("cardsBoard.png", 0, 0);
+
 			// Draw the top card
 			Card top = myGame.TopCard;
 			if (top != null)
 			{
-				SwinGame.DrawText ("Top Card is " + top.ToString (), Color.RoyalBlue, 0, 20);
-				SwinGame.DrawText ("Player 1 score: " + myGame.Score(0), Color.RoyalBlue, 0, 30);
-				SwinGame.DrawText ("Player 2 score: " + myGame.Score(1), Color.RoyalBlue, 0, 40);
+				SwinGame.LoadFontNamed ("GameFont", "Chunkfive.otf", 24);
+				SwinGame.DrawText ("Top Card is " + top.ToString (), Color.White, "GameFont", 0, 20);
+				SwinGame.DrawText ("Player 1 score: " + myGame.Score(0), Color.White, "GameFont", 0, 40);
+				SwinGame.DrawText ("Player 2 score: " + myGame.Score(1), Color.White, "GameFont", 0, 60);
 				SwinGame.DrawCell (SwinGame.BitmapNamed ("Cards"), top.CardIndex, 521, 153);
 			}
 			else
@@ -69,7 +69,7 @@ namespace CardGames
 			}
 
 			// Draw the back of the cards... to represent the deck
-			SwinGame.DrawCell (SwinGame.BitmapNamed ("Cards"), 52, 153, 153);
+			SwinGame.DrawCell (SwinGame.BitmapNamed ("Cards"), 52, 155, 153);
 
 			//Draw onto the screen
 			SwinGame.RefreshScreen(60);
@@ -84,46 +84,23 @@ namespace CardGames
 			myGame.Update(); // just ask the game to do this...
 		}
 
-		
         public static void Main()
         {
             //Open the game window
-            SwinGame.OpenGraphicsWindow("Snap!", 800, 600);
+            SwinGame.OpenGraphicsWindow("Snap!", 860, 500);
 
+			//Load the card images and set their cell details
             LoadResources();
             
-			Deck myDeck = new Deck ();
-			Card testCard = Card.RandomCard();
+			// Create the game!
+			Snap myGame = new Snap ();
 
             //Run the game loop
             while(false == SwinGame.WindowCloseRequested())
             {
-                //Fetch the next batch of UI interaction
-                SwinGame.ProcessEvents();
-                
-				SwinGame.DrawBitmap("QuickSnap_Background.png", 0, 0);
-                
-                
-				//generate a random card on spacebar press
-				if (SwinGame.KeyTyped(KeyCode.vk_SPACE) && myDeck.CardsRemaining > 0)
-                {
-					testCard = myDeck.Draw ();
-                }
-
-                //turn over the card on F press
-                if (SwinGame.KeyTyped(KeyCode.vk_f))
-                {
-                    testCard.TurnOver();
-                }
-
-                SwinGame.DrawText ("Card generated was: " + testCard.ToString (), Color.RoyalBlue, 0, 20);
-                SwinGame.DrawCell (SwinGame.BitmapNamed ("Cards"), testCard.CardIndex, 160, 50);
-
-                //Clear the screen and draw the framerate
-                SwinGame.DrawFramerate(0,0);
-
-                //Draw onto the screen
-                SwinGame.RefreshScreen(60);
+				HandleUserInput (myGame);
+				DrawGame (myGame);
+				UpdateGame (myGame);
             }
         }
     }
